@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tlleva/Pages/Login/phone.dart';
 import 'package:tlleva/Widgets/button.dart';
-import 'package:tlleva/api/api.dart';
+import 'package:tlleva/api/api_login.dart';
 
 import '../../../Const/const.dart';
 

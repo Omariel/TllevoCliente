@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tlleva/Const/const.dart';
+import 'package:tlleva/Pages/Cuenta/soporte_chat.dart';
 import 'package:tlleva/Widgets/button.dart';
 
 class Detalle extends StatelessWidget {
-  String date, price, code, img;
+  String date, price, code, img, myEmail;
   Detalle(
       {Key? key,
       required this.date,
       required this.code,
       required this.img,
-      required this.price})
+      required this.price,
+      required this.myEmail
+      })
       : super(key: key);
 
   @override
@@ -107,7 +110,7 @@ class Detalle extends StatelessWidget {
           Positioned(
               left: size.width * 0.12,
               top: size.height * 0.49,
-              child: Image.asset('Assets/Images/lineDetalle.png')),
+              child: Image.asset('Assets/Images/lineDetalle.png'),height: size.height*0.11,),
           Positioned(
             left: size.width * 0.22,
             right: size.width * 0.1,
@@ -204,15 +207,20 @@ class Detalle extends StatelessWidget {
               child: Button(callback: (){}, height: 0.021, text: 'Recibo', size: size, color: Const().black, colorTxt: Colors.white,))),
           Positioned(
             top: size.height*0.88,
-            child: Text(
-              'Ayuda con mi viaje',
-              style: TextStyle(
-                decoration: TextDecoration.underline,
-                fontWeight: FontWeight.w400,
-                fontSize: size.height * 0.017,
-                color: Colors.black,
-                height: 1.1,
-                fontFamily: 'Poppins',
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> SoporteChat(myEmail: myEmail)));
+                },
+              child: Text(
+                'Ayuda con mi viaje',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w400,
+                  fontSize: size.height * 0.017,
+                  color: Colors.black,
+                  height: 1.1,
+                  fontFamily: 'Poppins',
+                ),
               ),
             ))
         ],

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tlleva/Model/model.dart';
+import 'package:tlleva/Blocs/Location/location_bloc.dart';
+import 'package:tlleva/Model/model_login.dart';
 import 'package:tlleva/Pages/Cuenta/Ayuda/ayuda.dart';
 import 'package:tlleva/Pages/Cuenta/Configuracion/Configuracion.dart';
 import 'package:tlleva/Pages/Cuenta/Pagos/pago.dart';
 import 'package:tlleva/Pages/Cuenta/Viajes/viajes.dart';
 import 'package:tlleva/Pages/Login/term&cond.dart';
-import 'package:tlleva/api/api.dart';
+import 'package:tlleva/api/api_login.dart';
 
 class Cuenta extends StatefulWidget {
-  Cuenta({Key? key, required this.tokenUser, required this.data}) : super(key: key);
+  Cuenta({Key? key, required this.tokenUser, required this.data})
+      : super(key: key);
   String tokenUser;
   Map data;
 
@@ -20,13 +23,17 @@ class Cuenta extends StatefulWidget {
 class _CuentaState extends State<Cuenta> {
   String name1 = '';
   String name2 = '';
+  late LocationBloc locationBloc;
+
   @override
   void initState() {
+    locationBloc = BlocProvider.of<LocationBloc>(context);
     String name = widget.data['name'];
     name1 = name.split(' ')[0];
     name2 = name.split(' ')[1];
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -104,7 +111,7 @@ class _CuentaState extends State<Cuenta> {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Viajes())),
+                            builder: (context) => Viajes(myEmail: widget.data['email'],))),
                     child: Container(
                       height: size.height * 0.17,
                       width: size.width * 0.36,
@@ -196,7 +203,11 @@ class _CuentaState extends State<Cuenta> {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: ((context) => Configuracion(MyData: widget.data, name1: name1, name2: name2,)))),
+                            builder: ((context) => Configuracion(
+                                  MyData: widget.data,
+                                  name1: name1,
+                                  name2: name2,
+                                )))),
                     child: Container(
                       height: size.height * 0.17,
                       width: size.width * 0.36,
@@ -258,7 +269,8 @@ class _CuentaState extends State<Cuenta> {
                     padding: const EdgeInsets.only(left: 15.0),
                     child: GestureDetector(
                       onTap: () {
-                       Api().logOut(widget.tokenUser, context);
+                        Api().logOut(widget.tokenUser, context);
+                        locationBloc.stopFollowingUser();
                       },
                       child: Text(
                         'Cerrar sesión',

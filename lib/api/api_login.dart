@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tlleva/Const/const.dart';
-import 'package:tlleva/Model/model.dart';
+import 'package:tlleva/Model/model_login.dart';
 import 'package:tlleva/Pages/Home/home.dart';
 import 'package:tlleva/Pages/Login/Login/recuperar_password.dart';
 import 'package:tlleva/Pages/Login/confirmCode.dart';
@@ -32,6 +32,7 @@ class Api {
         Const().snackBarErrorSuccefull(
             context, 'El correo ya está registrado', Colors.red);
       } else if (success == true) {
+        // ignore: use_build_context_synchronously
         findCode(message.id, context, phone, email, password, false);
       }
     } else {

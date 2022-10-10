@@ -68,7 +68,7 @@ class Datos extends StatelessWidget {
                       controller: controllerName,
                       cursorColor: Colors.black,
                       validator: (value) {
-                        String pattern = r'(^[a-zA-Z ]*$)';
+                        String pattern = r'(^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$)';
                         RegExp regExp = RegExp(pattern);
                         if (value!.isEmpty) {
                           return "El nombre es necesario";

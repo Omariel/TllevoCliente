@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tlleva/Pages/Login/metodpago.dart';
+import 'package:tlleva/Widgets/button.dart';
+import 'package:tlleva/Widgets/column_builder.dart';
+import 'package:tlleva/api/api_home.dart';
 
 import '../../Const/const.dart';
-import '../../Widgets/button.dart';
-import '../Login/metodpago.dart';
 
 class BottomSheetSelectCar extends StatefulWidget {
-  const BottomSheetSelectCar({Key? key}) : super(key: key);
+  BottomSheetSelectCar({Key? key, required this.tokenUser}) : super(key: key);
+  String tokenUser;
 
   @override
   State<BottomSheetSelectCar> createState() => _BottomSheetSelectCarState();
 }
 
 class _BottomSheetSelectCarState extends State<BottomSheetSelectCar> {
-  int select = 1;
+  int select = 0;
+  List data = [];
+  bool cargando = true;
+  @override
+  void initState() {
+    ApiHome().categoryVehicle(widget.tokenUser, context).then((value) {
+      data = value;
+      setState(() {
+        cargando = false;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,45 +59,25 @@ class _BottomSheetSelectCarState extends State<BottomSheetSelectCar> {
           SizedBox(
             height: size.height * 0.05,
           ),
-          Padding(
-            padding: EdgeInsets.only(
-                left: size.width * 0.1, bottom: size.height * 0.01),
-            child: Text(
-              'PREFERENCIAL',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                  fontSize: size.height * 0.017,
-                  color: Colors.black,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  height: 1),
-            ),
-          ),
-          selectCar(size, 'Assets/Images/carSimpleYellow.svg', 4, 'tllevo',
-              'Llegada 1:09 p.m.', 15.05, 1),
-          selectCar(size, 'Assets/Images/bigcarSimpleYellow.svg', 6,
-              'tllevo family', 'Llegada 1:09 p.m.', 22.05, 2),
-          Padding(
-            padding: EdgeInsets.only(
-                left: size.width * 0.1,
-                top: size.height * 0.01,
-                bottom: size.height * 0.01),
-            child: Text(
-              'CONFORTABLE',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                  fontSize: size.height * 0.017,
-                  color: Colors.black,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  height: 1),
-            ),
-          ),
-          selectCar(size, 'Assets/Images/carSimple.svg', 4, 'tllevo',
-              'Llegada 1:12 p.m.', 20.05, 3),
-          selectCar(size, 'Assets/Images/bigcarSimple.svg', 6, 'tllevo family',
-              'Llegada 1:12 p.m.', 26.05, 4),
-          Divider(
+          ColumnBuilder(
+            itemCount: data.length, textDirection: TextDirection.ltr,
+            itemBuilder:(context, index) {
+              String type = data[index]['value'];
+              String typeF = type.replaceAll('Confortable ', '').replaceAll('Preferencial ', '');
+              if(index == data.length -1){
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                  selectCar(size, data[index]['value'] == 'Preferencial tllevo' ? 
+              'Assets/Images/carSimpleYellow.svg' : data[index]['value'] == 'Preferencial tllevo family' ? 
+              'Assets/Images/bigcarSimpleYellow.svg' : data[index]['value'] == 'Confortable tllevo' ? 
+              'Assets/Images/carSimple.svg' : 'Assets/Images/bigcarSimple.svg',
+              data[index]['value'] == 'Preferencial tllevo' ? 
+              4 : data[index]['value'] == 'Preferencial tllevo family' ? 
+              6 : data[index]['value'] == 'Confortable tllevo' ? 
+              4 : 6,
+              typeF, 'Llegada 1:09 p.m.', 4.50, index),
+              Divider(
               thickness: 3,
               height: size.height * 0.03,
               color: const Color(0xFFEAE9E9)),
@@ -140,7 +135,7 @@ class _BottomSheetSelectCarState extends State<BottomSheetSelectCar> {
                 height: size.height * 0.06,
                 child: Button(
                   callback: () {
-                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pop(data[select]);
                   },
                   height: 0.026,
                   text: 'Comenzar viaje',
@@ -148,7 +143,82 @@ class _BottomSheetSelectCarState extends State<BottomSheetSelectCar> {
                   color: Const().yellow,
                   colorTxt: Colors.black,
                 )),
-          )
+                )]);
+              }else if(index == 0){
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Padding(
+            padding: EdgeInsets.only(
+                left: size.width * 0.1, bottom: size.height * 0.01),
+            child: Text(
+              'PREFERENCIAL',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                  fontSize: size.height * 0.017,
+                  color: Colors.black,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  height: 1),
+            ),
+          ),
+                     selectCar(size, data[index]['value'] == 'Preferencial tllevo' ? 
+              'Assets/Images/carSimpleYellow.svg' : data[index]['value'] == 'Preferencial tllevo family' ? 
+              'Assets/Images/bigcarSimpleYellow.svg' : data[index]['value'] == 'Confortable tllevo' ? 
+              'Assets/Images/carSimple.svg' : 'Assets/Images/bigcarSimple.svg',
+              data[index]['value'] == 'Preferencial tllevo' ? 
+              4 : data[index]['value'] == 'Preferencial tllevo family' ? 
+              6 : data[index]['value'] == 'Confortable tllevo' ? 
+              4 : 6,
+              typeF, 'Llegada 1:09 p.m.', 4.50, index)
+                  ],
+                );
+              }
+              else if(index == 2){
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Padding(
+            padding: EdgeInsets.only(
+                left: size.width * 0.1, bottom: size.height * 0.01),
+            child: Text(
+              'CONFORTABLE',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                  fontSize: size.height * 0.017,
+                  color: Colors.black,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  height: 1),
+            ),
+          ),
+                     selectCar(size, data[index]['value'] == 'Preferencial tllevo' ? 
+              'Assets/Images/carSimpleYellow.svg' : data[index]['value'] == 'Preferencial tllevo family' ? 
+              'Assets/Images/bigcarSimpleYellow.svg' : data[index]['value'] == 'Confortable tllevo' ? 
+              'Assets/Images/carSimple.svg' : 'Assets/Images/bigcarSimple.svg',
+              data[index]['value'] == 'Preferencial tllevo' ? 
+              4 : data[index]['value'] == 'Preferencial tllevo family' ? 
+              6 : data[index]['value'] == 'Confortable tllevo' ? 
+              4 : 6,
+              typeF, 'Llegada 1:09 p.m.', 4.50, index)
+                  ],
+                );
+              }
+              else{
+              return cargando ?
+              const Center(child: CircularProgressIndicator()) :
+              selectCar(size, data[index]['value'] == 'Preferencial tllevo' ? 
+              'Assets/Images/carSimpleYellow.svg' : data[index]['value'] == 'Preferencial tllevo family' ? 
+              'Assets/Images/bigcarSimpleYellow.svg' : data[index]['value'] == 'Confortable tllevo' ? 
+              'Assets/Images/carSimple.svg' : 'Assets/Images/bigcarSimple.svg',
+              data[index]['value'] == 'Preferencial tllevo' ? 
+              4 : data[index]['value'] == 'Preferencial tllevo family' ? 
+              6 : data[index]['value'] == 'Confortable tllevo' ? 
+              4 : 6,
+              typeF, 'Llegada 1:09 p.m.', 4.50, index);
+
+              }
+            }, )
         ],
       ),
     );

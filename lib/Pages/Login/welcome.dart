@@ -35,8 +35,8 @@ class _WelcomeState extends State<Welcome> {
               child: SvgPicture.asset('Assets/Images/logoBlack.svg', width: size.width*0.7,)),
             Positioned(
               top: size.height*0.3,
-              left: size.width*0.18,
-              right: size.width*0.27,
+              left: size.width*0.25,
+              right: size.width*0.25,
               child: Text(
                 'Viaja cómodo y seguro',
                 textAlign: TextAlign.center,

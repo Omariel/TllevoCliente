@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tlleva/Blocs/Map/map_bloc.dart';
+import 'package:tlleva/Pages/Home/cliente_chat.dart';
 import 'package:tlleva/Pages/Home/home.dart';
 import 'package:tlleva/Pages/Home/infodriver.dart';
 import 'package:tlleva/Pages/Home/mensajes.dart';
@@ -10,8 +13,12 @@ import '../../Const/const.dart';
 import '../../Widgets/button.dart';
 
 class DraggableBottomSheet extends StatefulWidget {
-  DraggableBottomSheet({Key? key}) : super(key: key);
-
+  DraggableBottomSheet({Key? key, required this.myEmail, required this.hisEmail,
+  required this.dirEnd, required this.hisName}) : super(key: key);
+  String myEmail;
+  String hisEmail;
+  String hisName;
+  String dirEnd;
   @override
   State<DraggableBottomSheet> createState() => _DraggableBottomSheetState();
 }
@@ -62,14 +69,17 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                             borderRadius: BorderRadius.circular(30)),
                       ),
                     ),
-                    Text(
-                      'En camino a LaGuardia\nAirport Queens',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: size.height * 0.025,
-                          color: Colors.black,
-                          fontFamily: 'Poppins',
-                          height: 1),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: size.width*0.1),
+                      child: Text(
+                        'En camino a ${widget.dirEnd}',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontSize: size.height * 0.025,
+                            color: Colors.black,
+                            fontFamily: 'Poppins',
+                            height: 1),
+                      ),
                     ),
                     SizedBox(
                       height: size.height * 0.015,
@@ -85,247 +95,342 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: SizedBox(
-                                    height: size.height * 0.7,
-                                    width: size.width * 0.9,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: size.height * 0.06,
-                                            ),
-                                            Text(
-                                              '¿Qué tal estuvo tu viaje?',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: size.height * 0.025,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Poppins',
-                                                  height: 1),
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.02,
-                                            ),
-                                            SvgPicture.asset(
-                                              'Assets/Images/simpleFace.svg',
-                                              height: size.height * 0.085,
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.035,
-                                            ),
-                                            Text(
-                                              'Ricardo López',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: size.height * 0.021,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontFamily: 'Poppins',
-                                                  height: 1),
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.035,
-                                            ),
-                                            Text(
-                                              'Califica tu viaje',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: size.height * 0.025,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Poppins',
-                                                  height: 1),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  color: Colors.black26,
-                                                  size: size.height * 0.06,
-                                                ),
-                                                Icon(
-                                                  Icons.star,
-                                                  color: Colors.black26,
-                                                  size: size.height * 0.06,
-                                                ),
-                                                Icon(
-                                                  Icons.star,
-                                                  color: Colors.black26,
-                                                  size: size.height * 0.06,
-                                                ),
-                                                Icon(
-                                                  Icons.star,
-                                                  color: Colors.black26,
-                                                  size: size.height * 0.06,
-                                                ),
-                                                Icon(
-                                                  Icons.star,
-                                                  color: Colors.black26,
-                                                  size: size.height * 0.06,
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.02,
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: size.width * 0.07),
-                                              child: Text(
-                                                'Dar propina a Ricardo López cuando finalice el viaje',
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        size.height * 0.021,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Poppins',
-                                                    height: 1),
+                        int cantStars = 0;
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return Dialog(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: SizedBox(
+                                          height: size.height * 0.7,
+                                          width: size.width * 0.9,
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    height: size.height * 0.06,
+                                                  ),
+                                                  Text(
+                                                    '¿Qué tal estuvo tu viaje?',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            size.height * 0.025,
+                                                        color: Colors.black,
+                                                        fontFamily: 'Poppins',
+                                                        height: 1),
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.02,
+                                                  ),
+                                                  SvgPicture.asset(
+                                                    'Assets/Images/simpleFace.svg',
+                                                    height: size.height * 0.085,
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.035,
+                                                  ),
+                                                  Text(
+                                                    'gg', //widget.hisName,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            size.height * 0.021,
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontFamily: 'Poppins',
+                                                        height: 1),
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.035,
+                                                  ),
+                                                  Text(
+                                                    'Califica tu viaje',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            size.height * 0.025,
+                                                        color: Colors.black,
+                                                        fontFamily: 'Poppins',
+                                                        height: 1),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            setState(() {
+                                                          cantStars = 1;
+                                                        }),
+                                                        child: Icon(
+                                                          Icons.star,
+                                                          color: cantStars >= 1
+                                                              ? Colors.yellow
+                                                              : Colors.black26,
+                                                          size: size.height *
+                                                              0.06,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            setState(() {
+                                                          cantStars = 2;
+                                                        }),
+                                                        child: Icon(
+                                                          Icons.star,
+                                                          color: cantStars >= 2
+                                                              ? Colors.yellow
+                                                              : Colors.black26,
+                                                          size: size.height *
+                                                              0.06,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            setState(() {
+                                                          cantStars = 3;
+                                                        }),
+                                                        child: Icon(
+                                                          Icons.star,
+                                                          color: cantStars >= 3
+                                                              ? Colors.yellow
+                                                              : Colors.black26,
+                                                          size: size.height *
+                                                              0.06,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            setState(() {
+                                                          cantStars = 4;
+                                                        }),
+                                                        child: Icon(
+                                                          Icons.star,
+                                                          color: cantStars >= 4
+                                                              ? Colors.yellow
+                                                              : Colors.black26,
+                                                          size: size.height *
+                                                              0.06,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            setState(() {
+                                                          cantStars = 5;
+                                                        }),
+                                                        child: Icon(
+                                                          Icons.star,
+                                                          color: cantStars >= 5
+                                                              ? Colors.yellow
+                                                              : Colors.black26,
+                                                          size: size.height *
+                                                              0.06,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.02,
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal:
+                                                                size.width *
+                                                                    0.1),
+                                                    child: Text(
+                                                      'Dar Propina a gg', //'Dar propina a ${widget.hisName} cuando finalice el viaje',
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              size.height *
+                                                                  0.021,
+                                                          color: Colors.black,
+                                                          fontFamily: 'Poppins',
+                                                          height: 1),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.02,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height:
+                                                            size.height * 0.035,
+                                                        width: size.width * 0.2,
+                                                        color: const Color
+                                                                .fromARGB(
+                                                            255, 233, 232, 232),
+                                                        child: Text(
+                                                          '\$1.00',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  size.height *
+                                                                      0.021,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontFamily:
+                                                                  'Poppins',
+                                                              height: 0),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height:
+                                                            size.height * 0.035,
+                                                        width: size.width * 0.2,
+                                                        color: const Color
+                                                                .fromARGB(
+                                                            255, 233, 232, 232),
+                                                        child: Text(
+                                                          '\$3.00',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  size.height *
+                                                                      0.021,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontFamily:
+                                                                  'Poppins',
+                                                              height: 0),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height:
+                                                            size.height * 0.035,
+                                                        width: size.width * 0.2,
+                                                        color: const Color
+                                                                .fromARGB(
+                                                            255, 233, 232, 232),
+                                                        child: Text(
+                                                          '\$5.00',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  size.height *
+                                                                      0.021,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontFamily:
+                                                                  'Poppins',
+                                                              height: 0),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: size.height * 0.05,
+                                                  ),
+                                                  SizedBox(
+                                                      height:
+                                                          size.height * 0.06,
+                                                      width: size.width * 0.7,
+                                                      child: Button(
+                                                          callback: () {
+                                                            // final mapBloc =
+                                                            //     BlocProvider.of<
+                                                            //         MapBloc>(context);
+                                                            // mapBloc.clearRoutes();
+                                                            // Navigator.push(
+                                                            //     context,
+                                                            //     MaterialPageRoute(
+                                                            //         builder: (context) =>
+                                                            //             Home(
+                                                            //                 show:
+                                                            //                     false)));
+                                                          },
+                                                          height: 0.021,
+                                                          text: 'Enviar',
+                                                          size: size,
+                                                          color: Colors.black,
+                                                          colorTxt:
+                                                              Colors.white)),
+                                                  SizedBox(
+                                                    height: size.height * 0.01,
+                                                  ),
+                                                  Text(
+                                                    'Omitir',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          size.height * 0.021,
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Poppins',
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.02,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Container(
-                                                  alignment: Alignment.center,
-                                                  height: size.height * 0.035,
-                                                  width: size.width * 0.2,
-                                                  color: const Color.fromARGB(
-                                                      255, 233, 232, 232),
-                                                  child: Text(
-                                                    '\$1.00',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            size.height * 0.021,
-                                                        color: Colors.black,
-                                                        fontFamily: 'Poppins',
-                                                        height: 0),
+                                              Positioned(
+                                                top: size.height * 0.18,
+                                                child: Container(
+                                                  height: size.height * 0.03,
+                                                  width: size.width * 0.13,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.star_rate_rounded,
+                                                        color: Colors.white,
+                                                        size:
+                                                            size.height * 0.02,
+                                                      ),
+                                                      Text(
+                                                        '5.0',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              size.height *
+                                                                  0.017,
+                                                          color: Colors.white,
+                                                          fontFamily: 'Poppins',
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                Container(
-                                                  alignment: Alignment.center,
-                                                  height: size.height * 0.035,
-                                                  width: size.width * 0.2,
-                                                  color: const Color.fromARGB(
-                                                      255, 233, 232, 232),
-                                                  child: Text(
-                                                    '\$3.00',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            size.height * 0.021,
-                                                        color: Colors.black,
-                                                        fontFamily: 'Poppins',
-                                                        height: 0),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  alignment: Alignment.center,
-                                                  height: size.height * 0.035,
-                                                  width: size.width * 0.2,
-                                                  color: const Color.fromARGB(
-                                                      255, 233, 232, 232),
-                                                  child: Text(
-                                                    '\$5.00',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            size.height * 0.021,
-                                                        color: Colors.black,
-                                                        fontFamily: 'Poppins',
-                                                        height: 0),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: size.height * 0.05,
-                                            ),
-                                            SizedBox(
-                                                height: size.height * 0.06,
-                                                width: size.width * 0.7,
-                                                child: Button(
-                                                    callback: () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  Home(
-                                                                      show:
-                                                                          false)));
-                                                    },
-                                                    height: 0.021,
-                                                    text: 'Enviar',
-                                                    size: size,
-                                                    color: Colors.black,
-                                                    colorTxt: Colors.white)),
-                                            SizedBox(
-                                              height: size.height * 0.01,
-                                            ),
-                                            Text(
-                                              'Omitir',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: size.height * 0.021,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Positioned(
-                                          top: size.height * 0.18,
-                                          child: Container(
-                                            height: size.height * 0.03,
-                                            width: size.width * 0.13,
-                                            decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Icon(
-                                                  Icons.star_rate_rounded,
-                                                  color: Colors.white,
-                                                  size: size.height * 0.02,
-                                                ),
-                                                Text(
-                                                  '5.0',
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        size.height * 0.017,
-                                                    color: Colors.white,
-                                                    fontFamily: 'Poppins',
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ));
+                                      );
+                                    },
+                                  ));
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -347,42 +452,35 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                       thickness: 1.2,
                       height: size.height * 0.05,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: size.width * 0.12,
-                        ),
-                        Icon(
-                          Icons.location_on_sharp,
-                          size: size.height * 0.025,
-                          color: Colors.black,
-                        ),
-                        SizedBox(
-                          width: size.width * 0.05,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'LaGuardia Airport',
+                    Padding(
+                      padding: const EdgeInsets.only(right: 50),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: size.width * 0.12,
+                          ),
+                          Icon(
+                            Icons.location_on_sharp,
+                            size: size.height * 0.025,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            width: size.width * 0.05,
+                          ),
+                          Expanded(
+                            child: Text(
+                              widget.dirEnd,
+                              textAlign: TextAlign.start,
                               style: TextStyle(
                                   fontSize: size.height * 0.017,
                                   color: Colors.black,
                                   fontFamily: 'Poppins',
                                   height: 1),
                             ),
-                            Text(
-                              'Queens, NY 11271, Estados Unidos',
-                              style: TextStyle(
-                                  fontSize: size.height * 0.017,
-                                  color: Colors.black,
-                                  fontFamily: 'Poppins',
-                                  height: 1),
-                            ),
-                          ],
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                     Divider(
                       thickness: 1.2,
@@ -661,7 +759,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                           ),
                         ),
                         Text(
-                          'Ricardo López',
+                          widget.hisName,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: size.height * 0.021,
@@ -685,23 +783,28 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                       thickness: 1.2,
                       height: size.height * 0.03,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Dar propina a Ricardo\nLópez cuando finalice\nel viaje',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: size.height * 0.021,
-                              color: Colors.black,
-                              fontFamily: 'Poppins',
-                              height: 1),
-                        ),
-                        SvgPicture.asset(
-                          'Assets/Images/propinaCoins.svg',
-                          height: size.height * 0.055,
-                        )
-                      ],
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: size.width*0.15),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Dar propina a ${widget.hisName} cuando finalice el viaje',
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  fontSize: size.height * 0.021,
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins',
+                                  height: 1),
+                            ),
+                          ),
+                          SizedBox(width: size.width*0.1,),
+                          SvgPicture.asset(
+                            'Assets/Images/propinaCoins.svg',
+                            height: size.height * 0.055,
+                          )
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: size.height * 0.025,
@@ -908,7 +1011,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                           ),
                         ),
                         Text(
-                          'Ricardo López',
+                          widget.hisName,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: size.height * 0.021,
@@ -936,7 +1039,11 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Mensajes())),
+                              builder: (context) => ClienteChat(
+                                    myEmail: widget.myEmail,
+                                    hisEmail: widget.hisEmail,
+                                    hisName: widget.hisName
+                                  ))),
                       child: Container(
                         alignment: Alignment.center,
                         height: size.height * 0.05,

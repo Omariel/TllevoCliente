@@ -3,7 +3,8 @@ import 'package:tlleva/Const/const.dart';
 import 'package:tlleva/Pages/Cuenta/Viajes/detalle.dart';
 
 class Viajes extends StatelessWidget {
-  const Viajes({Key? key}) : super(key: key);
+  Viajes({Key? key, required this.myEmail}) : super(key: key);
+  String myEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,7 @@ class Viajes extends StatelessWidget {
           left: size.width * 0.1,
           right: size.width * 0.1),
       child: GestureDetector(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>Detalle(date: date, code: code, img: 'Assets/Images/mapDetalle.png', price: price))),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>Detalle(date: date, code: code, img: 'Assets/Images/mapDetalle.png', price: price, myEmail: myEmail,))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tlleva/Pages/Login/finish.dart';
-import 'package:tlleva/api/api.dart';
+import 'package:tlleva/api/api_login.dart';
 
 import 'addtarjeta.dart';
 
